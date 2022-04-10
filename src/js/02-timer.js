@@ -1,5 +1,6 @@
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
+import Notiflix from 'notiflix';
 
 const refs = {
     input: document.querySelector('input'),
@@ -9,7 +10,7 @@ const refs = {
     minutes: document.querySelector('span[data-minutes]'),
     seconds: document.querySelector('span[data-seconds]'),
 };
-
+let chosenDay;
 
 const options = {
   enableTime: true,
@@ -17,18 +18,25 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
+    chosenDay = selectedDates[0];
+   
     if (selectedDates[0] - Date.now() < 0) {
-    //   Notify.info(“Please choose a date in the future”);
-        window.alert("Please choose a date in the future");
+      
+      Notiflix.Notify.info('Please choose a date in the future');
+      refs.buttonStart.disabled = true;
+        // window.alert("Please choose a date in the future");
           return;
       }
-    const chosenDate = selectedDates[0];
-    console.log(chosenDate);
-      refs.buttonStart.disabled = false;
-  
+    refs.buttonStart.disabled = false;
+    
   },
 };
+
 flatpickr("#datetime-picker", options);
+
+// const a = options.onClose()
+// console.log(a)
+
 let timerId = null;
 // console.log(refs.input);
 // console.log(refs.buttonStart);
@@ -44,9 +52,21 @@ const onClickStart = () => {
     refs.input.setAttribute('disabled', 'true');
     refs.buttonStart.setAttribute('disabled', 'true');
     
+  
+
+    
     timerId = setInterval(() => {
-        const rizultTime = convertMs();
-        markUpChange(rizultTime);
+
+       if (chosenDay - Date.now() <= 0 ) {
+         clearInterval(timerId);
+        //  markUpChange(0, 0, 0, 0);
+         return;
+         
+      }
+              const rizultTime = convertMs(chosenDay - Date.now());
+      markUpChange(rizultTime);
+      console.log(chosenDay - Date.now())
+      
     }, 1000);
 
   
